@@ -27,6 +27,71 @@ def naked_twins(values):
 	# Find all instances of naked twins
 	# Eliminate the naked twins as possibilities for their peers
 
+	# for testing purpose
+	print("before")
+	display(values)
+	print("\n")
+
+	twins_values = []
+
+	for row in row_units:
+		twins_values_rows = [box for box in row if len(values[box]) == 2]
+		if len(twins_values_rows) > 1:
+			unique_value = set([values[e] for e in twins_values_rows])
+			if len(unique_value) == 1:
+				twins_values.append(twins_values_rows)
+			else:
+				for n in unique_value:
+					matched_pairs = [box for box in twins_values_rows if n in values[box]]
+					if len(matched_pairs) == 2:
+						twins_values.append(matched_pairs)
+
+	print("test", twins_values)
+
+
+
+	for pairs in twins_values:
+		pair = [values[e] for e in pairs]
+		print(pair)
+
+
+
+	for e in twins_values:
+		twins_pairs_row = [box for box in row_units[e] if len(values[box]) == 2 and values[box] == values[e]]
+		twins_pairs_col = [box for box in column_units[e] if len(values[box]) == 2 and values[box] == values[e]]
+		
+		if len(twins_pairs_row) > 1:
+			twins_pairs = twins_pairs_row
+		elif len(twins_pairs_col) > 1:
+			twins_pairs = twins_pairs_col
+
+		print("twins_pairs",e,twins_pairs)
+		if len(twins_pairs) > 0:
+			for box in [box for box in peers[e] if len(values[box]) > 1 and values[box] != values[e]]:
+				# print("e",values[e])
+				# print("box",values[box])
+				for n in values[e]:
+					values[box] = values[box].replace(n,'')
+				# print("box after",values[box])
+		# Now use recurrence to solve each one of the resulting sudokus, and 
+	
+	# if values_b4 == values:
+	# 	return values
+	# else:
+	# 	naked_twins(values)
+
+	print("\n")
+	print("after")
+	display(values)
+	print("\n")
+
+	# print(values)
+
+	return(values)
+
+
+
+
 def cross(a, b):
 	"Cross product of elements in A and elements in B."
 	return [s+t for s in a for t in b]
@@ -100,7 +165,9 @@ def only_choice(values):
 		for digit in '123456789':
 			dplaces = [box for box in unit if digit in values[box]]
 			if len(dplaces) == 1:
-				values[dplaces[0]] = digit
+				#values[dplaces[0]] = digit
+				# new function from the project
+				assign_value(values, dplaces[0], digit)
 	return values
 
 def reduce_puzzle(values):
@@ -136,7 +203,9 @@ def search(values):
 	# Now use recurrence to solve each one of the resulting sudokus, and 
 	for value in values[s]:
 		new_sudoku = values.copy()
-		new_sudoku[s] = value
+		#new_sudoku[s] = value
+		# New function from the project
+		assign_value(new_sudoku, s, value)
 		attempt = search(new_sudoku)
 		if attempt:
 			return attempt
