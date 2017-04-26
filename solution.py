@@ -15,6 +15,12 @@ def assign_value(values, box, value):
 		assignments.append(values.copy())
 	return values
 
+def replace_value(values,boxes,targets):
+	for box in boxes:
+		if len(values[box]) > 1:
+			for target in targets:
+				assign_value(values, box, values[box].replace(target[0],''))
+
 def naked_twins(values):
 	"""Eliminate values using the naked twins strategy.
 	Args:
@@ -27,66 +33,20 @@ def naked_twins(values):
 	# Find all instances of naked twins
 	# Eliminate the naked twins as possibilities for their peers
 
-	# for testing purpose
-	print("before")
-	display(values)
-	print("\n")
-
-	twins_values = []
-
-	for row in row_units:
-		twins_values_rows = [box for box in row if len(values[box]) == 2]
-		if len(twins_values_rows) > 1:
-			unique_value = set([values[e] for e in twins_values_rows])
-			if len(unique_value) == 1:
-				twins_values.append(twins_values_rows)
+	for boxes in row_units + column_units:
+		twins_values_boxes = [box for box in boxes if len(values[box]) == 2]
+		# If there is a pair
+		if len(twins_values_boxes) > 1:
+			unique_values = set([values[e] for e in twins_values_boxes])
+			# If the pair has only 1 set/unique value, then it is a twins
+			if len(unique_values) == 1:
+				replace_value(values,[box for box in boxes if box not in twins_values_boxes],list(unique_values)[0])
 			else:
-				for n in unique_value:
-					matched_pairs = [box for box in twins_values_rows if n in values[box]]
+				# Or Else twins matched in the set value, since the twins requirement is 2 matched box with set value length at 2
+				for unique_value in unique_values:
+					matched_pairs = [box for box in twins_values_boxes if unique_value in values[box] and len(unique_value) == 2]
 					if len(matched_pairs) == 2:
-						twins_values.append(matched_pairs)
-
-	print("test", twins_values)
-
-
-
-	for pairs in twins_values:
-		pair = [values[e] for e in pairs]
-		print(pair)
-
-
-
-	for e in twins_values:
-		twins_pairs_row = [box for box in row_units[e] if len(values[box]) == 2 and values[box] == values[e]]
-		twins_pairs_col = [box for box in column_units[e] if len(values[box]) == 2 and values[box] == values[e]]
-		
-		if len(twins_pairs_row) > 1:
-			twins_pairs = twins_pairs_row
-		elif len(twins_pairs_col) > 1:
-			twins_pairs = twins_pairs_col
-
-		print("twins_pairs",e,twins_pairs)
-		if len(twins_pairs) > 0:
-			for box in [box for box in peers[e] if len(values[box]) > 1 and values[box] != values[e]]:
-				# print("e",values[e])
-				# print("box",values[box])
-				for n in values[e]:
-					values[box] = values[box].replace(n,'')
-				# print("box after",values[box])
-		# Now use recurrence to solve each one of the resulting sudokus, and 
-	
-	# if values_b4 == values:
-	# 	return values
-	# else:
-	# 	naked_twins(values)
-
-	print("\n")
-	print("after")
-	display(values)
-	print("\n")
-
-	# print(values)
-
+						replace_value(values,[box for box in boxes if box not in matched_pairs],unique_value)
 	return(values)
 
 
@@ -104,9 +64,14 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-unitlist = row_units + column_units + square_units
+# Solving diagonal by having left and right together
+diagonal_left = [rows[x]+cols[x] for x in range(0,9)]
+diagonal_right = [rows[x]+cols[8-x] for x in range(0,9)]
+# Adding digonal constraint into the unitlist
+unitlist = row_units + column_units + square_units + [diagonal_left,diagonal_right]
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
+
 
 def grid_values(grid):
 	"""
@@ -219,17 +184,21 @@ def solve(grid):
 	Returns:
 		The dictionary representation of the final sudoku grid. False if no solution exists.
 	"""
+
 	values = grid_values(grid)
-	display(values)
-	print("\n")
+	# print("question is ")
+	# display(values)
+	# print("\n")
 
 	values = eliminate(values)
-	display(values)
-	print("\n")
+	# display(values)
+	# print("\n")
 
 	values = search(values)
-	display(values)
-	print("\n")
+
+	return values
+	# display(values)
+	# print("\n")
 
 if __name__ == '__main__':
 	diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'

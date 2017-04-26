@@ -67,43 +67,16 @@ class TestNakedTwins(unittest.TestCase):
          'I3': '5', 'I4': '7', 'I5': '2', 'I6': '6', 'I7': '1', 'I8': '4', 'I9': '8'}
     ]
 
-    # def test_naked_twins(self):
-    #     print("Printing Question")
-    #     solution.display(self.before_naked_twins_2)
-    #     print("\n")
-    #     print("Printing Answer 0")
-    #     solution.display(self.possible_solutions_2[0])
+    def test_naked_twins(self):
 
-    #     print("\n")
-    #     print("Printing Answer 1")
-        
-    #     solution.display(self.possible_solutions_2[1])
-    #     print("\n")
-
-    #     print("testing0",self.before_naked_twins_1 == self.possible_solutions_1[0])
-    #     print("testing1",self.before_naked_twins_1 == self.possible_solutions_1[1])
-
-    #     self.assertTrue(solution.naked_twins(self.before_naked_twins_1) in self.possible_solutions_1,
-    #                     "Your naked_twins function produced an unexpected board.")
-
-    def test_naked_twins2(self):
-
-        print("Printing Question")
-        solution.display(self.before_naked_twins_2)
-        print("\n")
-        print("Printing Answer 0")
-        solution.display(self.possible_solutions_2[0])
-
-        print("\n")
-        print("Printing Answer 1")
-        
-        solution.display(self.possible_solutions_2[1])
-        print("\n")
-
-        self.assertTrue(solution.naked_twins(self.before_naked_twins_2) in self.possible_solutions_2,
+        self.assertTrue(solution.naked_twins(self.before_naked_twins_1) in self.possible_solutions_1,
                         "Your naked_twins function produced an unexpected board.")
 
 
+    def test_naked_twins2(self):
+
+        self.assertTrue(solution.naked_twins(self.before_naked_twins_2) in self.possible_solutions_2,
+                        "Your naked_twins function produced an unexpected board.")
 
 class TestDiagonalSudoku(unittest.TestCase):
     diagonal_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
@@ -120,6 +93,7 @@ class TestDiagonalSudoku(unittest.TestCase):
                           'D1': '5'}
 
     def test_solve(self):
+
         self.assertEqual(solution.solve(self.diagonal_grid), self.solved_diag_sudoku)
 
 if __name__ == '__main__':
